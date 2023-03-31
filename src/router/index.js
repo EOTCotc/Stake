@@ -12,6 +12,11 @@ const routes = [
 		name: 'init'
 	},
 	{
+		path: '/page',
+		name: 'page',
+		component: () => import('@/components/Nav/page')
+	},
+	{
 		path: '/index',
 		name: 'index',
 		redirect: {
@@ -23,10 +28,7 @@ const routes = [
 				path: 'Pledges_home',
 				name: 'Pledges_home',
 				component: () => import('@/components/ChooseWay/nft_home')
-			},
-
-
-
+			}
 		]
 	},
 
@@ -35,19 +37,19 @@ const routes = [
 		name: 'Chainrecord',
 		component: () => import('@/components/ChooseWay/Chainrecord')
 	},
-	
+
 	{
 		path: '/Introduction',
 		name: 'Introduction',
 		component: () => import('@/components/ChooseWay')
 	},
-	
+
 	{
 		path: '/conceal',
 		name: 'conceal',
 		component: () => import('@/components/ChooseWay/conceal')
 	},
-	
+
 	{
 		path: '/verify',
 		name: 'verify',
@@ -66,19 +68,18 @@ const routes = [
 const originalReplace = VueRouter.prototype.replace;
 
 VueRouter.prototype.replace = function replace(location) {
-	return originalReplace.call(this, location).catch((err) => { });
+	return originalReplace.call(this, location).catch((err) => {});
 };
 
 const originalPush = VueRouter.prototype.push;
 
 VueRouter.prototype.push = function push(location) {
-	return originalPush.call(this, location).catch((err) => { });
+	return originalPush.call(this, location).catch((err) => {});
 };
 
 const router = new VueRouter({
 	routes
 });
-
 
 // router.beforeEach((to, form, next) => {
 // 	if (to.name === 'Pledges_home') {
