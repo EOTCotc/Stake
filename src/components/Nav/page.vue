@@ -1,13 +1,10 @@
 <template>
-  <div class="Nav-container"
-       id="nav">
+  <div class="page">
     <van-nav-bar fixed
                  placeholder
                  z-index="10"
                  @click-left="onClickLeft"
                  :border="false">
-      <!-- @click-right="onClickRight" -->
-
       <template #left>
         <i class="iconfont icon-menu"></i>
       </template>
@@ -16,13 +13,9 @@
              src="@/assets/currency-icons/eotc.png"
              alt="" />
       </template>
-      <template #right
-                v-if="!zhiyaShow&&uid != null">
-        <i class="iconfont icon-wode"></i>
-      </template>
     </van-nav-bar>
 
-    <!-- <van-popup v-model="zhiyaShow"
+    <van-popup v-model="zhiyaShow"
                position="left"
                get-container="#nav"
                class="pop">
@@ -37,7 +30,7 @@
                alt="" />
         </div>
       </div>
-    </van-popup> -->
+    </van-popup>
   </div>
 </template>
 
@@ -51,16 +44,17 @@ export default {
       zhiyaShow: true,
       list: [
         { title: 'EOTC官网', event: 'https://eotc.im' },
+        { title: '去中心化借贷理财 EDF' },
         { title: '链上理财赚币', event: 'https://fi.eotc.im/' },
         { title: '去中心化 OTC 交易所', event: 'https://trx.eotc.im/' },
         { title: '去中心化币币交易所', event: 'https://swap.eotc.im/' },
         { title: '去中心化借贷交易所' },
         { title: '去中心化合约交易所' },
-        { title: 'DID去中心化身份系统' },
+        { title: 'DID去中心化身份系统', event: 'https://did.eotc.me' },
         { title: '去中心化应用系统' },
         { title: 'EOTC 元宇宙' },
         { title: 'EOTC NFT', event: 'https://nft.eotc.im/' },
-        { title: 'EOTC DAO' }
+        { title: 'EOTC DAO', event: 'https://dao.eotc.me' }
       ],
       uid: ''
     }
@@ -72,17 +66,14 @@ export default {
     })
   },
   mounted() {
-    this.$bus.$on('sendBus', (data) => {
-      this.getPath()
-    })
+    // this.$bus.$on('sendBus', (data) => {
+    //   this.getPath()
+    // })
   },
 
   methods: {
     onClickLeft() {
-      // this.zhiyaShow = !this.zhiyaShow
-      this.$router.push({
-        name: 'page'
-      })
+      this.$router.back()
     },
     // onClickRight() {
     //   this.zhiyaShow = false;
@@ -110,7 +101,6 @@ export default {
 
     //点击中间logo回到首页
     gohome() {
-      this.zhiyaShow = false
       this.$router.replace({ name: 'index' })
     }
   }

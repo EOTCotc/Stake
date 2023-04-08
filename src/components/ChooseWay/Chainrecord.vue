@@ -1,13 +1,11 @@
 <template>
   <div>
-    <van-nav-bar
-      :title="title"
-      :border="false"
-      fixed
-      placeholder
-      left-arrow
-      @click-left="$router.back()"
-    />
+    <van-nav-bar :title="title"
+                 :border="false"
+                 fixed
+                 placeholder
+                 left-arrow
+                 @click-left="$router.back()" />
     <div class="content">
       <div class="top">
         <div class="frist">
@@ -25,78 +23,103 @@
           </div>
         </div>
       </div>
-      <van-tabs title-active-color="#fff" background="#161622" @click="cut()" v-model="active">
+      <van-tabs title-active-color="#fff"
+                background="#161622"
+                @click="cut()"
+                v-model="active">
         <van-tab title="一期质押">
           <div class="center">
-            <div class="empty" v-if="list.length==0">
-              <img src="@/static/icon/kong.png" alt />
+            <div class="empty"
+                 v-if="list.length==0">
+              <img src="@/static/icon/kong.png"
+                   alt />
               <p>暂无数据</p>
             </div>
-            <div class="orderList" v-for="(item,index) in list" :key="index">
+            <div class="orderList"
+                 v-for="(item,index) in list"
+                 :key="index">
               <div class="listTop">
                 <p v-if="item.state==4">订单编号: {{item.id}}</p>
                 <p v-else>质押编号: {{item.id}}</p>
                 <div class="topFlex">
                   <p>{{item.date}}</p>
                   <p v-if="item.state==1">质押到期:{{item.time}}</p>
+                  <p>
+                    <van-button @click="unStakeOne(item.id,item.zong)"
+                                size="small"
+                                v-if="item.state==2"
+                                type="info">赎回</van-button>
+
+                  </p>
                 </div>
               </div>
               <div class="listCenter">
                 <div>
                   <p>质押数量</p>
-                  <p>{{item.amount}}</p>
+                  <p>{{(item.amount*1).toFixed(2)}}</p>
                 </div>
                 <div>
                   <p v-if="item.state==3">累计收益</p>
                   <p v-else>预估收益</p>
-                  <p>+{{item.reward}}</p>
+                  <p>+{{(item.reward*1).toFixed(2)}}</p>
                 </div>
                 <div v-if="item.state==1">
                   <p>到期可赎回</p>
-                  <p>{{item.zong}}</p>
+                  <p>{{(item.zong*1).toFixed(2)}}</p>
                 </div>
               </div>
-              <div
-                class="listState"
-                :class="item.state==1?'State2':item.state==2?'State3':'State1'"
-              >{{item.text}}</div>
+              <div class="listState"
+                   :class="item.state==1?'State2':item.state==2?'State3':'State1'">{{item.text}}</div>
             </div>
           </div>
         </van-tab>
         <van-tab title="二期质押">
           <div class="center">
-            <div class="empty" v-if="list.length==0">
-              <img src="@/static/icon/kong.png" alt />
+            <div class="empty"
+                 v-if="list.length==0">
+              <img src="@/static/icon/kong.png"
+                   alt />
               <p>暂无数据</p>
             </div>
-            <div class="orderList" v-for="(item,index) in list" :key="index">
+            <div class="orderList"
+                 v-for="(item,index) in list"
+                 :key="index">
               <div class="listTop">
                 <p v-if="item.state==4">订单编号: {{item.id}}</p>
                 <p v-else>质押编号: {{item.id}}</p>
                 <div class="topFlex">
                   <p>{{item.date}}</p>
                   <p v-if="item.state==1">质押到期:{{item.time}}</p>
+                  <p>
+                    <van-button @click="unStakeOtcTwo(item.id,item.zong)"
+                                size="small"
+                                v-if="item.state==2"
+                                type="info">复投</van-button>
+                    <van-button @click="unStakeTwo(item.id,item.zong)"
+                                size="small"
+                                v-if="item.state==2"
+                                type="info">赎回</van-button>
+
+                  </p>
                 </div>
               </div>
               <div class="listCenter">
                 <div>
                   <p>质押数量</p>
-                  <p>{{item.amount}}</p>
+                  <p>{{(item.amount*1).toFixed(2)}}</p>
                 </div>
                 <div>
                   <p v-if="item.state==3">累计收益</p>
                   <p v-else>预估收益</p>
-                  <p>+{{item.reward}}</p>
+                  <p>+{{(item.reward*1).toFixed(2)}}</p>
                 </div>
                 <div v-if="item.state==1">
                   <p>到期可赎回</p>
-                  <p>{{item.zong}}</p>
+                  <p>{{(item.zong*1).toFixed(2)}}</p>
                 </div>
               </div>
-              <div
-                class="listState"
-                :class="item.state==1?'State2':item.state==2?'State3':'State1'"
-              >{{item.text}}</div>
+              <div class="listState"
+                   :class="item.state==1?'State2':item.state==2?'State3':'State1'">{{item.text}}</div>
             </div>
           </div>
         </van-tab>
@@ -106,9 +129,9 @@
 </template>
 
 <script>
-import { mypledge1, mypledge2 } from '@/utils/web3_stake'
+import { mypledge1, mypledge2, RegularUnstaking, RegularUnstakingTwo, SecondPledge } from '@/utils/web3_stake'
 import { MyStakeList } from '@/api/trxRequest'
-import { Toast } from 'vant'
+import { Toast, Dialog } from 'vant'
 export default {
   data() {
     return {
@@ -123,14 +146,15 @@ export default {
       //总待赎回
       allsh: 0,
 
-      active: '0',
+      active: '0'
     }
   },
   created() {
+    console.log(this.list)
     Toast.loading({
       duration: 0, // 持续展示 toast
       forbidClick: true,
-      message: '加载中',
+      message: '加载中'
     })
     this.zq = localStorage.getItem('zq')
     if (this.zq == 6) {
@@ -143,10 +167,25 @@ export default {
     this.init()
   },
   methods: {
+    unStakeOne(id, zong) {
+      RegularUnstaking(id, this.zq).then((res) => {
+        if (res) this.cut()
+      })
+    },
+    unStakeOtcTwo(id, zong) {
+      SecondPledge(id, this.zq, zong).then((res) => {
+        if (res) this.cut()
+      })
+    },
+    unStakeTwo(id, zong) {
+      RegularUnstakingTwo(id, this.zq).then((res) => {
+        if (res) this.cut()
+      })
+    },
     cut() {
-      this.allsy=0
-      this.allzy=0
-      this.allsh=0
+      this.allsy = 0
+      this.allzy = 0
+      this.allsh = 0
       this.init()
     },
     init() {
@@ -215,6 +254,7 @@ export default {
           } else {
             i.state = 2
             i.text = '待赎回'
+            i.zong = (i.amount + i.reward).toFixed(2)
             console.log(this.allsh)
             this.allsh = Number(this.allsh * 1 + i.amount + i.reward).toFixed(2)
             console.log(this.allsh)
@@ -255,29 +295,9 @@ export default {
         c_Sen = c_Date.getSeconds()
       if (bool) {
         // 判断是否需要显示秒
-        var c_Time =
-          c_Year +
-          '-' +
-          this.getzf(c_Month) +
-          '-' +
-          this.getzf(c_Day) +
-          ' ' +
-          this.getzf(c_Hour) +
-          ':' +
-          this.getzf(c_Min) +
-          ':' +
-          this.getzf(c_Sen) //最后拼接时间
+        var c_Time = c_Year + '-' + this.getzf(c_Month) + '-' + this.getzf(c_Day) + ' ' + this.getzf(c_Hour) + ':' + this.getzf(c_Min) + ':' + this.getzf(c_Sen) //最后拼接时间
       } else {
-        var c_Time =
-          c_Year +
-          '-' +
-          this.getzf(c_Month) +
-          '-' +
-          this.getzf(c_Day) +
-          ' ' +
-          this.getzf(c_Hour) +
-          ':' +
-          this.getzf(c_Min) //最后拼接时间
+        var c_Time = c_Year + '-' + this.getzf(c_Month) + '-' + this.getzf(c_Day) + ' ' + this.getzf(c_Hour) + ':' + this.getzf(c_Min) //最后拼接时间
       }
       return c_Time
     },
@@ -286,12 +306,16 @@ export default {
         c_num = '0' + c_num
       }
       return c_num
-    },
-  },
+    }
+  }
 }
 </script>
 
 <style lang='less' scoped>
+/deep/ .van-button {
+  width: fit-content;
+  margin-left: 6px;
+}
 /deep/.van-nav-bar {
   background-color: #0d0415;
 }
